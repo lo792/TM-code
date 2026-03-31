@@ -112,7 +112,7 @@ classDiagram
     +Announce announce
     +display()
   }
-  class Sreen {
+  class Screen {
     +CardGrid cardGrid
     +ScoreDisplayer scoreDisplayer
     +TourDisplayer tourDisplayer
@@ -122,7 +122,7 @@ classDiagram
     +AnnounceDisplayer announceDisplayer
     +display()
   }
-  class LeaderSreen {
+  class LeaderScreen {
     +PlanWord plan
     +display()
     -applyPlanWord() transformedPlanGrid
