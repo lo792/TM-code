@@ -1,10 +1,49 @@
-def choisir_prenoms() -> list:
-    type = ['bleu', 'rouge']
-    equipe = ['player', 'leader']
-    resultat = []
-    print("Merci d'entrer les joueurs")
-    for e in equipe:
-        for t in type:
-            d = input(f"{e} {t}: ")
-            resultat.append(f"{e} {t}: {d}")
-    return resultat   
+class Team:
+    
+    def __init__(self, colour: str, player: Player, leader: Leader):
+        self.player = player
+        self.leader = leader
+        self.colour = colour
+        self.success_words = []
+    
+    def add_success_word(self, success_word: str):
+        self.success_words.append(success_word)
+    
+    def get_leader(self) -> Leader:
+        return self.leader
+    
+    def get_player(self) -> Player:
+        return self.player
+    
+    def describe(self):
+        self.leader.description()
+        self.player.description()
+        print(self.colour)
+
+class Leader:
+    
+    def __init__(self, name):
+        self.name = name
+        
+    def announce(self) -> dict:
+        mot=input("un mot")
+        fois=int(input("cb de fois?"))
+        return {
+            'mot': mot,
+            'fois': fois
+        }
+    
+    def description(self):
+        print(f"{self.name} tu es leader")
+
+class Player:
+    
+    def __init__(self, name):
+        self.name = name
+       
+    def guess_word(self):
+        return input("un mot a selectionné")
+    
+    def description(self):
+        print(f"{self.name} tu es player")
+    

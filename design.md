@@ -79,7 +79,7 @@ classDiagram
   }
   GameFactory ..|> Game : build
 ```
-### User Inerface (UI)
+### User Interface (UI)
 ```mermaid
 classDiagram
   class Dimensions {

@@ -2,8 +2,7 @@ from features.word_type import blue_list, red_list, grey_list, black_word
 from features.word_list import liste_25_mot
 
 
-def print_leader_screen (title: str, ):
-    print(title)
+def print_leader_screen ():
     for sequence in liste_25_mot:
         for mot in sequence:
             if mot in blue_list:
