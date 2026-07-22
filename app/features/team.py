@@ -42,7 +42,7 @@ class Player:
         self.name = name
        
     def guess_word(self):
-        return input("un mot a selectionné")
+        return input("un mot a selectionné ")
     
     def description(self):
         print(f"{self.name} tu es player")
