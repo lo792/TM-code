@@ -5,8 +5,17 @@ from .word_type import blue_list, red_list, grey_list, black_word
 class Game:
     def __init__(self, teamred: Team, teamblue: Team):
         self.tour_nb=0
-        self.state="on continue"
+        self.state="fin du tour"
         self.teams=[teamred, teamblue]
+        self.announce: str = ""
+        self.fois: int = 0
+    
+    def set_announce(self, announce: str, fois: int):
+        self.announce = announce
+        self.fois = fois
+    
+    def get_team(self, color: str) -> Team:
+        return self.teams[0] if color.lower() == 'red' else self.teams[1]
     
     def current_team(self) -> Team:
         current_team_index = self.tour_nb % 2# à chaque tour, c'est 0 ou 1, alternés
@@ -62,7 +71,7 @@ class Game:
     #            
     #    return announce
     
-    def check (self, word_to_check: str, fois: int):
+    def check(self, word_to_check: str, fois: int):
         #if fois == 0:
          #   self.state="fin du tour"
           #  return

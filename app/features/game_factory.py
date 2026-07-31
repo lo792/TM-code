@@ -4,11 +4,11 @@ from .game import Game
 
 class Game_factory:
     @staticmethod
-    def get_game(data: dict) -> Game:
-        l = Leader(data["leader_blue"])
-        p = Player(data["player_blue"])
+    def get_game() -> Game:
+        l = Leader("leader_blue")
+        p = Player("player_blue")
         team_blue = Team('blue', p, l)
-        l = Leader(data["leader_red"])
-        p = Player(data["player_red"])
+        l = Leader("leader_red")
+        p = Player("player_red")
         team_red = Team('red', p, l)
         return Game(team_red, team_blue)

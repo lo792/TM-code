@@ -2,7 +2,9 @@ from features.word_type import blue_list, red_list, grey_list, black_word
 from features.word_list import liste_25_mot
 from features.team import Leader, Team, Player
 from features.game import Game
-        
+
+from .ui_nice_guy import input_name
+
 
 class Ui_game():
      
@@ -17,12 +19,7 @@ class Ui_game():
     
     @staticmethod     
     def input_teams() -> dict:
-        return {
-            "leader_blue": input("Quel est ton nom leader bleu? "),
-            "player_blue": input("Quel est ton nom joueur bleu? "),
-            "leader_red": input("Quel est ton nom leader rouge? "),
-            "player_red": input("Quel est ton nom joueur rouge? ")
-        }
+        return input_name()
     
     def print_current_team(self):
         print(self.game.current_team().leader.name)
@@ -141,5 +138,5 @@ class Ui_player:
         print(f"{self.player.name} tu es player")
         
     def print_player_screen():
-        print_word_grid()
+        pass
     

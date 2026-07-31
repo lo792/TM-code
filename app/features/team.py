@@ -1,5 +1,4 @@
 class Team:
-    
     def __init__(self, color: str, player: Player, leader: Leader):
         self.player = player
         self.leader = leader
@@ -14,16 +13,25 @@ class Team:
     
     def get_player(self) -> Player:
         return self.player
-
-
-class Leader():
     
+    def set_names(self, player_name: str, leader_name: str):
+        self.player.set_name(player_name)
+        self.leader.set_name(leader_name)
+
+
+class Person():
     def __init__(self, name: str):
+        self.name = name
+    
+    def set_name(self, name: str):
         self.name = name
 
 
-class Player():
-    
+class Leader(Person):
     def __init__(self, name: str):
-        self.name = name
-        
+        super().__init__(name)
+
+
+class Player(Person):
+    def __init__(self, name: str):
+        super().__init__(name)
