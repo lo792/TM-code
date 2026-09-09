@@ -72,9 +72,6 @@ class Game:
     #    return announce
     
     def check(self, word_to_check: str, fois: int):
-        #if fois == 0:
-         #   self.state="fin du tour"
-          #  return
         if word_to_check in self.get_current_word_type_list():
             self.state="on continue"
             self.current_team().add_success_word(word_to_check)
