@@ -1,5 +1,8 @@
 from .team import Team
-from .word_type import blue_list, red_list, grey_list, black_word
+from .word_type import cree_liste_couleur
+from .word_list import liste_25_mot
+
+blue_list, red_list, grey_list, black_word = cree_liste_couleur()
 
 
 class Game:
@@ -56,20 +59,16 @@ class Game:
             return False
     
     #def verify_annonce(self, announce) -> str:
-    #    while True:
-    #        tous_les_mots_de_la_grille = (
-    #            self.get_current_word_type_list() +
-    #            self.get_not_current_word_type_list() +
-    #            black_word +
-    #            grey_list
-    #        )
-    #        if announce in tous_les_mots_de_la_grille:
-    #            print("Ce mot n'est pas dans la grille")
-    #            announce = self.current_team().get_leader().announce()
-    #        else:
-    #            return True
-    #            
-    #    return announce
+#        tous_les_mots_de_la_grille = (
+#            self.get_current_word_type_list() +
+#            self.get_not_current_word_type_list() +
+#            black_word +
+#            grey_list
+#        )
+#        if announce in tous_les_mots_de_la_grille:
+#            return False
+#        
+#        return True
     
     def check(self, word_to_check: str, fois: int):
         if word_to_check in self.get_current_word_type_list():
@@ -91,6 +90,6 @@ class Game:
                 self.winner = self.not_current_team().color
         else:
             self.state = "fin du tour"
-            self.not_current_team().add_success_word(word_to_check)
+            #self.not_current_team().add_success_word(word_to_check)
         
         
