@@ -4,9 +4,13 @@ class Team:
         self.leader = leader
         self.color = color
         self.success_words = []
+        self.fail_words = []
     
     def add_success_word(self, success_word: str):
         self.success_words.append(success_word)
+        
+    def add_fail_word(self, word_to_check):
+        self.fail_words.append(word_to_check)
     
     def get_leader(self) -> Leader:
         return self.leader

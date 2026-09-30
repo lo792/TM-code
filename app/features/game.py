@@ -1,8 +1,5 @@
 from .team import Team
-from .word_type import cree_liste_couleur
-from .word_list import liste_25_mot
-
-blue_list, red_list, grey_list, black_word = cree_liste_couleur()
+from .word_type import blue_list, red_list, grey_list, black_word
 
 
 class Game:
@@ -42,33 +39,18 @@ class Game:
         else:
             return red_list
     
-    def verify_word_to_guess(self, word_to_check) -> bool:
+    
+    def verify_annonce(self, announce: str) -> bool:
         tous_les_mots_de_la_grille = (
             self.get_current_word_type_list() +
             self.get_not_current_word_type_list() +
             black_word +
             grey_list
         )
-        deja_devine = (
-            self.current_team().success_words +
-            self.not_current_team().success_words
-        )
-        if (word_to_check in tous_les_mots_de_la_grille) and (word_to_check not in deja_devine):
-            return True
-        else:
+        if announce.lower() in tous_les_mots_de_la_grille:
             return False
-    
-    #def verify_annonce(self, announce) -> str:
-#        tous_les_mots_de_la_grille = (
-#            self.get_current_word_type_list() +
-#            self.get_not_current_word_type_list() +
-#            black_word +
-#            grey_list
-#        )
-#        if announce in tous_les_mots_de_la_grille:
-#            return False
-#        
-#        return True
+        else:
+            return True
     
     def check(self, word_to_check: str, fois: int):
         if word_to_check in self.get_current_word_type_list():
@@ -81,6 +63,7 @@ class Game:
         elif word_to_check in black_word:
             self.state="fin du jeu"
             self.winner=self.not_current_team().color
+            self.current_team().add_fail_word(word_to_check)
             return
         elif word_to_check in self.get_not_current_word_type_list():
             self.state = "fin du tour"
@@ -90,6 +73,6 @@ class Game:
                 self.winner = self.not_current_team().color
         else:
             self.state = "fin du tour"
-            #self.not_current_team().add_success_word(word_to_check)
+            self.current_team().add_fail_word(word_to_check)
         
         

@@ -2,11 +2,12 @@ from nicegui import ui
 from features.word_type import blue_list, red_list, grey_list, black_word
 from features.word_list import liste_25_mot
 from features.game import Game
+from features.game_factory import Game_factory
 
 
 def create_ui(game: Game) -> None:
     state: dict = {"screen": "setup"}
-
+    
     def get_card_color(word: str) -> str:
         if word in blue_list:
             return "blue"
@@ -19,13 +20,32 @@ def create_ui(game: Game) -> None:
         return "brown"
 
     def is_word_found(word: str) -> bool:
-        all_found = game.teams[0].success_words + game.teams[1].success_words
+        all_found = game.teams[0].success_words + game.teams[1].success_words + game.teams[0].fail_words + game.teams[1].fail_words
         return word in all_found
 
     # fenêtre player (http://localhost:8080/player)
 
     @ui.page("/player")
     def player_page():
+         # Carte non trouvée
+        def make_click_handler(word):
+            def handle_click():
+                if game.state != "on continue":
+                    ui.notify("Attendez le tour de jeu !", color="warning")
+                    return
+                # Vérification avec la fonction check de game.py
+                game.check(word, game.fois)
+
+                if game.state == "on continue":
+                    game.fois -= 1
+                    if game.fois <= 0:
+                        game.state = "fin du tour"
+                        game.tour_nb += 1
+                elif game.state == "fin du tour":
+                    game.tour_nb += 1
+                render_player.refresh()
+            return handle_click
+
         @ui.refreshable
         def render_player():
             if state["screen"] == "setup":
@@ -44,9 +64,33 @@ def create_ui(game: Game) -> None:
 
                 # Écran de fin de partie
                 if game.state == "fin du jeu":
+                    def on_start(names):
+                        for key in names:
+                            game.get_team(key).set_names(names[key]['player'], names[key]['leader'])
+                        state["screen"] = "playing"
+                        render_player.refresh()
+                    
                     winner_color = getattr(game, 'winner', 'Inconnu')
+                    
+                    # AJOUTER - ON RECREE LE JEU nonlocal C'EST LA CLEF POUR REDEFINIR LE GAME: on prend le game pas local donc définit tout en haut
+                    def restart_game():
+                        nonlocal game
+                        # CHANGE LA FACTORY POUR POUVOIR DONNER DES NOMS COMME çA SI LES JOUEURS NE CHANGENT PAS ALORS ILS REAPPARAISSENT
+                        game = Game_factory.get_game(
+                            game.teams[0].get_leader().name,
+                            game.teams[0].get_player().name,
+                            game.teams[1].get_leader().name,
+                            game.teams[1].get_player().name
+                        )
+                        state["screen"] = "setup" # ON REMET setup POUR FORCER LE RECOMMENCEMENT
+                        render_player.refresh()
+    
                     with ui.card().classes("w-full text-center bg-amber-100 p-6"):
                         ui.label(f"🏆 Partie terminée ! Victoire de l'équipe {winner_color.upper()} !").classes("text-3xl font-bold text-amber-900")
+                        # LE BOUTON DE RECOMMENCER: CLICK => restart_game()
+                        ui.button("Recommencer une partie", icon="replay", on_click=restart_game, color="primary").props("size=lg")
+                    # RETURN PERMET DE QUITTER ET DE NE PAS AFFICHER CE QU'IL Y A DESSOUS
+                    return
 
                 # Tour en attente de l'indice du leader
                 elif game.state == "fin du tour":
@@ -69,37 +113,15 @@ def create_ui(game: Game) -> None:
                 # Grille des cartes
                 for r in liste_25_mot:
                     with ui.row().classes("w-full gap-2 justify-center"):
-                        for w in r:
-                            found = is_word_found(w)
-                            real_color = get_card_color(w)
+                        for mot_de_la_ligne in r:
+                            found = is_word_found(mot_de_la_ligne)
+                            real_color = get_card_color(mot_de_la_ligne)
 
                             if found:
                                 # Carte déjà trouvée
-                                ui.button(f"{w}", color=real_color).props("unelevated").classes("w-32 h-14 opacity-75")
+                                ui.button(text=mot_de_la_ligne, color=real_color).props("unelevated").classes("w-32 h-14 opacity-75")
                             else:
-                                # Carte non trouvée
-                                def make_click_handler(word=w):
-                                    def handle_click():
-                                        if game.state != "on continue":
-                                            ui.notify("Attendez le tour de jeu !", color="warning")
-                                            return
-
-                                        # Vérification avec la fonction check de game.py
-                                        game.check(word, game.fois)
-
-                                        if game.state == "on continue":
-                                            game.fois -= 1
-                                            if game.fois <= 0:
-                                                game.state = "fin du tour"
-                                                game.tour_nb += 1
-                                        elif game.state == "fin du tour":
-                                            game.tour_nb += 1
-
-                                        render_player.refresh()
-
-                                    return handle_click
-
-                                ui.button(f"{w}", color="brown", on_click=make_click_handler()).classes("w-32 h-14")
+                                ui.button(text=mot_de_la_ligne, color="brown", on_click=make_click_handler(mot_de_la_ligne)).classes("w-32 h-14")
 
         render_player()
 
@@ -126,11 +148,11 @@ def create_ui(game: Game) -> None:
                         ui.label(f" Tour du Leader {game.current_team().color.upper()} ({game.current_team().get_leader().name})").classes("text-lg font-bold")
                         with ui.row().classes("w-full items-center gap-3"):
                             input_clue = ui.input("Mot Indice").classes("grow")
-                            input_count = ui.number("Nombre de cartes", value=1, min=1, max=9).classes("w-32")
+                            input_count = ui.number("Nombre de cartes", value=1, min=1, max=8).classes("w-32")
 
                             def send_clue():
-                                if not input_clue.value:
-                                    ui.notify("Veuillez entrer un mot indice !", color="negative")
+                                if not input_clue.value or not game.verify_annonce(input_clue.value):
+                                    ui.notify("Veuillez entrer un mot indice différent!", color="negative")
                                     return
                                 game.set_announce(str(input_clue.value), int(input_count.value))
                                 game.state = "on continue"
@@ -142,6 +164,12 @@ def create_ui(game: Game) -> None:
                         ui.label(f"Indice actif : {game.announce} ({game.fois} restant(s)) - Le joueur devine...").classes("text-lg")
                         ui.button("Actualiser la vue", on_click=render_leader.refresh).props("outline")
 
+                # Écran de fin de partie
+                if game.state == "fin du jeu":
+                    winner_color = getattr(game, 'winner', 'Inconnu')
+                    with ui.card().classes("w-full text-center bg-amber-100 p-6"):
+                        ui.label(f"🏆 Partie terminée ! Victoire de l'équipe {winner_color.upper()} !").classes("text-3xl font-bold text-amber-900")
+                    
                 # Grille visible par le Leader (toutes les vraies couleurs)
                 for r in liste_25_mot:
                     with ui.row().classes("w-full gap-2 justify-center"):
@@ -151,7 +179,7 @@ def create_ui(game: Game) -> None:
 
                             # Si trouvé, on ajoute une couleur differente
                             label_text = f"✓ {w}" if found else f"{w}"
-                            btn = ui.button(label_text, color=c).props("unelevated").classes("w-32 h-14")
+                            btn = ui.button(text=label_text, color=c).props("unelevated").classes("w-32 h-14")
                             if found:
                                 btn.classes("opacity-40")
 
@@ -204,7 +232,8 @@ def display_setup(game: Game, on_start) -> None:
             on_start(names)
 
         with ui.row().classes("w-full justify-center gap-3"):
+            # UTILISER link POUR OUVRI PAGE LEADER ET NEW TAB TRUE POUR OUVRIR NOUVEL ONGLET
+            ui.link("Ouvrir ce lien pour la page des leaders:", "http://localhost:8080/leader", new_tab=True)
+                    
+        with ui.row().classes("w-full justify-center gap-3"):
             ui.button("Commencer la partie", icon="play_arrow", on_click=start).props("size=lg color=primary")
-
-
-
