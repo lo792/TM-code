@@ -1,6 +1,4 @@
 from nicegui import ui
-from features.word_type import blue_list, red_list, grey_list, black_word
-from features.word_list import liste_25_mot
 from features.game import Game
 from features.game_factory import Game_factory
 
@@ -9,13 +7,13 @@ def create_ui(game: Game) -> None:
     state: dict = {"screen": "setup"}
     
     def get_card_color(word: str) -> str:
-        if word in blue_list:
+        if word in game.blue_list:
             return "blue"
-        elif word in red_list:
+        elif word in game.red_list:
             return "red"
-        elif word in grey_list:
+        elif word in game.grey_list:
             return "grey"
-        elif word in black_word:
+        elif word in game.black_word:
             return "black"
         return "brown"
 
@@ -111,7 +109,7 @@ def create_ui(game: Game) -> None:
                         ui.button("Passer le tour", on_click=end_turn, color="warning").props("outline")
 
                 # Grille des cartes
-                for r in liste_25_mot:
+                for r in game.liste_25_mot:
                     with ui.row().classes("w-full gap-2 justify-center"):
                         for mot_de_la_ligne in r:
                             found = is_word_found(mot_de_la_ligne)
@@ -171,7 +169,7 @@ def create_ui(game: Game) -> None:
                         ui.label(f"🏆 Partie terminée ! Victoire de l'équipe {winner_color.upper()} !").classes("text-3xl font-bold text-amber-900")
                     
                 # Grille visible par le Leader (toutes les vraies couleurs)
-                for r in liste_25_mot:
+                for r in game.liste_25_mot:
                     with ui.row().classes("w-full gap-2 justify-center"):
                         for w in r:
                             c = get_card_color(w)
@@ -179,7 +177,7 @@ def create_ui(game: Game) -> None:
 
                             # Si trouvé, on ajoute une couleur differente
                             label_text = f"✓ {w}" if found else f"{w}"
-                            btn = ui.button(text=label_text, color=c).props("unelevated").classes("w-32 h-14")
+                            btn = ui.button(text=label_text, color=c).props("unelevated").classes("w-32 h-14 text-white")
                             if found:
                                 btn.classes("opacity-40")
 

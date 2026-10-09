@@ -1,4 +1,4 @@
-from .word_list import liste_25_mot
+from .word_list import cree_list_de_25_mot
 import random
 
 
@@ -7,6 +7,8 @@ def cree_liste_couleur()->tuple[list]:
     red_list = []
     grey_list = []
     black_word = []
+    liste_25_mot = cree_list_de_25_mot()
+    
     flat_liste_25 = [item for sublist in liste_25_mot for item in sublist]
     for i in range(8):
         mot_blue = random.choice(flat_liste_25)
@@ -20,10 +22,7 @@ def cree_liste_couleur()->tuple[list]:
         flat_liste_25.remove(mot_grey)
     black = random.choice(flat_liste_25)
     black_word.append(black)
-    return blue_list, red_list, grey_list, black_word
-
-
-blue_list, red_list, grey_list, black_word = cree_liste_couleur()
+    return liste_25_mot, blue_list, red_list, grey_list, black_word
 
 
 if __name__ == "__main__":

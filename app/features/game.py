@@ -1,14 +1,24 @@
 from .team import Team
-from .word_type import blue_list, red_list, grey_list, black_word
+from .word_type import cree_liste_couleur
 
 
 class Game:
-    def __init__(self, teamred: Team, teamblue: Team):
+    def __init__(self, teamred: Team, teamblue: Team, ):
         self.tour_nb=0
         self.state="fin du tour"
         self.teams=[teamred, teamblue]
         self.announce: str = ""
         self.fois: int = 0
+        self.blue_list = []
+        self.red_list = []
+        self.grey_list = []
+        self.black_word = []
+        self.liste_25_mot = []
+        self.cree_listes()
+        
+    def cree_listes(self):
+        self.liste_25_mot, self.blue_list, self.red_list, self.grey_list, self.black_word = cree_liste_couleur()
+        return self.liste_25_mot, self.blue_list, self.red_list, self.grey_list, self.black_word
     
     def set_announce(self, announce: str, fois: int):
         self.announce = announce
@@ -18,7 +28,7 @@ class Game:
         return self.teams[0] if color.lower() == 'red' else self.teams[1]
     
     def current_team(self) -> Team:
-        current_team_index = self.tour_nb % 2# à chaque tour, c'est 0 ou 1, alternés
+        current_team_index = self.tour_nb % 2 # à chaque tour, c'est 0 ou 1, alternés
         return self.teams[current_team_index]
     
     def not_current_team(self) -> Team:
@@ -28,24 +38,24 @@ class Game:
     def get_current_word_type_list(self) -> list:
         team=self.current_team()
         if team.color=="blue":
-            return blue_list
+            return self.blue_list
         else:
-            return red_list
+            return self.red_list
         
     def get_not_current_word_type_list(self) -> list:
         team=self.not_current_team()
         if team.color=="blue":
-            return blue_list
+            return self.blue_list
         else:
-            return red_list
+            return self.red_list
     
     
     def verify_annonce(self, announce: str) -> bool:
         tous_les_mots_de_la_grille = (
             self.get_current_word_type_list() +
             self.get_not_current_word_type_list() +
-            black_word +
-            grey_list
+            self.black_word +
+            self.grey_list
         )
         if announce.lower() in tous_les_mots_de_la_grille:
             return False
@@ -60,7 +70,7 @@ class Game:
                 self.state = "fin du jeu"
                 self.winner=self.current_team().color
             return   
-        elif word_to_check in black_word:
+        elif word_to_check in self.black_word:
             self.state="fin du jeu"
             self.winner=self.not_current_team().color
             self.current_team().add_fail_word(word_to_check)

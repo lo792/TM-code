@@ -45,5 +45,3 @@ def cree_list_de_25_mot()->list[str]:
         liste_25.append(ligne)
     return liste_25
 
-
-liste_25_mot = cree_list_de_25_mot()
